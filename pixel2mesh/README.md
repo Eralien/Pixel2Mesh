@@ -1,3 +1,4 @@
+CONSTRUCTING THE **FEED DICT**
 construct feed dictionary by pickle load importing the .dat composed by two parts,
 pkl[0]: coordinates (name='features')
 pkl[1]: support 1
@@ -61,3 +62,6 @@ shape: (156, 3), 156 vertices with 3-dim coordinates
     [1]: shape (618, 10) int
     [2]: shape (2466, 10) int
 
+
+BUILD THE MODEL
+Basic *Model* Module:
