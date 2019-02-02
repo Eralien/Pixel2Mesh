@@ -11,49 +11,49 @@
 7. pkl\[7]: laplacian_normalization
 
 ### pkl
-0. \[0]: coordinates: 
-shape: (156, 3), 156 vertices with 3-dim coordinates
+0. \[0]: coordinates:
+    - shape: (156, 3), 156 vertices with 3-dim coordinates
 
-1. \[1]: unknown, feed into support1
+1. \[1]: edge, feed into block 1 
     - \[0]:
         ```
-        [0]: shape (156, 2) int, all composed by \[n, n], n from 0 to 155
+        [0]: shape (156, 2) int, all composed by [n, n], n from 0 to 155
         [1]: shape (156,), = ones(156, 1) float
-        [2]: = \[156, 156]
+        [2]: = [156, 156]
         ```
     - \[1]:
         ```
         [0]: shape (1080, 2) int
         [1]: shape (1080,) float
-        [2]: = \[156, 156]
+        [2]: = [156, 156]
         ```
 
-2. \[2]: unknown, feed into support2
+2. \[2]: edge, feed into block 2
     - \[0]:
         ```
-        [0]: shape (618, 2) int, all composed by \[n, n], n from 0 to 617
+        [0]: shape (618, 2) int, all composed by [n, n], n from 0 to 617
         [1]: shape (156,), = ones(618, 1) float
-        [2]: \[618, 618]
+        [2]: [618, 618]
         ```
     - \[1]:
         ``` 
         [0]: shape (4314, 2) int
         [1]: shape (4314,) float
-        [2]: = \[618, 618]
+        [2]: = [618, 618]
         ```
 
-3. \[3]: unknown, feed into support3
+3. \[3]: edge, feed into block 3
     - \[0]:
         ```
-        [0]: shape(2466, 2) int, all composed by \[n, n], n from 1 to 156
+        [0]: shape(2466, 2) int, all composed by [n, n], n from 1 to 156
         [1]: shape(2466,) = ones(2466, 1)
-        [2]: = \[2466, 2466]
+        [2]: = [2466, 2466]
         ```
     - \[1]:
         ```
         [0]: shape (17250, 2) int
         [1]: shape (17250,) float
-        [2]: = \[2466, 2466]
+        [2]: = [2466, 2466]
         ```
 
 4. \[4]: pool_idx
@@ -85,3 +85,10 @@ shape: (156, 3), 156 vertices with 3-dim coordinates
 
 ## BUILD THE **MODEL**
 ### Basic *Model*  Module:
+1. First to go through function \_\_init_\_, get a series of blank properties including name, logging, vars, placeholders, payers, activations, inputs, outputs, loss, optimizer, opt_op.
+
+2. 
+
+## MULTITHREAD DATA PROCESSING **FETCHER**
+### Inherit from threading.Thread
+Use 

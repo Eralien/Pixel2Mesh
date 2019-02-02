@@ -12,7 +12,7 @@ class Model(object):
             assert kwarg in allowed_kwargs, 'Invalid keyword argument: ' + kwarg
         name = kwargs.get('name')
         if not name:
-            name = self.__class__.__name__.lower()
+            name = self.__class__.__name__.lower() # Get the name of the child class: GCN
         self.name = name
 
         logging = kwargs.get('logging', False)
