@@ -54,7 +54,7 @@ unzip checkpoint.zip
 ```
 
 #### Reconstructing shapes
-    python demo.py --image utils/examples/plane.png
+    python pixel2mesh.demo --image pixelmesh/utils/examples/plane.png
 Run the demo code and the output mesh file is saved in utils/examples/plane.obj 
 
 #### Input image, output mesh
