@@ -54,7 +54,7 @@ unzip checkpoint.zip
 ```
 
 #### Reconstructing shapes
-    python pixel2mesh.demo --image pixelmesh/utils/examples/plane.png
+    python -m pixel2mesh.demo --image pixelmesh/utils/examples/plane.png
 Run the demo code and the output mesh file is saved in utils/examples/plane.obj 
 
 #### Input image, output mesh
@@ -85,7 +85,7 @@ Each .dat file in the provided data contain: </br>
 ![label](./pictures/car_example.gif)
 
 # Training
-    python train.py
+    python -m pixel2mesh.train
 You can change the training data, learning rate and other parameters by editing `train.py`
 
 # Evaluation
