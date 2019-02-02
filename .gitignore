@@ -4,3 +4,4 @@
 pixel2mesh/external
 *.zip
 pixel2mesh/utils/checkpoint
+.vscode/
