@@ -11,9 +11,9 @@ tf.set_random_seed(seed)
 # Settings
 flags = tf.app.flags
 FLAGS = flags.FLAGS
-# flags.DEFINE_string('image', 'pixel2mesh/utils/examples/chair.png', 'Testing image.')
-flags.DEFINE_string('image', 'pixel2mesh/utils/examples/1.jpg', 'Testing image.')
-flags.DEFINE_float('learning_rate', 0., 'Initial learning rate.')
+flags.DEFINE_string('data_list', 'pixel2mesh/utils/train_list_new.txt', 'Data list path.')
+flags.DEFINE_float('learning_rate', 3e-5, 'Initial learning rate.')
+flags.DEFINE_integer('epochs', 30, 'Number of epochs to train.')
 flags.DEFINE_integer('hidden', 192, 'Number of units in  hidden layer.')
 flags.DEFINE_integer('feat_dim', 963, 'Number of units in perceptual feature layer.')
 flags.DEFINE_integer('coord_dim', 3, 'Number of units in output layer.') 
@@ -58,15 +58,13 @@ def construct_feed_dict(pkl, placeholders):
 	feed_dict.update({placeholders['support3'][i]: pkl[3][i] for i in range(len(pkl[3]))})
 	return feed_dict
 
-def load_image(img_path):
-	img = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-	if img.shape[2] == 4:
-		img[np.where(img[:,:,3]==0)] = 255
-	img = cv2.resize(img, (224,224))
-	img = img.astype('float32')/255.0
-	return img[:,:,:3]
+# Load data
+data = DataFetcher(FLAGS.data_list)
+data.setDaemon(True) ####
+data.start() # To initiate the threads
+train_number = data.number
 
-# Load data, initialize session
+# Initialize session
 config=tf.ConfigProto()
 config.gpu_options.allow_growth=True
 config.allow_soft_placement=True
@@ -74,22 +72,33 @@ sess = tf.Session(config=config)
 sess.run(tf.global_variables_initializer())
 model.load(sess)
 
-# Runing the demo
-# pkl = pickle.load(open('./pixel2mesh/utils/ellipsoid/info_ellipsoid.dat', 'rb'))
-pkl = pickle.load(open('./Debugging/pixel2mesh/pkl.dat', 'rb'))
-
-
+# Construct feed dictionary
+pkl = pickle.load(open('pixel2mesh/utils/ellipsoid/info_ellipsoid.dat', 'rb'))
 feed_dict = construct_feed_dict(pkl, placeholders)
 
-img_inp = load_image(FLAGS.image)
-feed_dict.update({placeholders['img_inp']: img_inp})
-feed_dict.update({placeholders['labels']: np.zeros([10,6])})
+# Train model
+train_loss = open('pixel2mesh/utils/record_training_loss.log', 'a')
+train_loss.write('Start training, lr =  %f\n'%(FLAGS.learning_rate))
+for epoch in range(FLAGS.epochs):
+	all_loss = np.zeros(train_number, dtype='float32') 
+	for iters in range(train_number):
+		# Fetch training data
+		img_inp, y_train, data_id = data.fetch()
+		feed_dict.update({placeholders['img_inp']: img_inp})
+		feed_dict.update({placeholders['labels']: y_train})
 
-vert = sess.run(model.output3, feed_dict=feed_dict)
-vert = np.hstack((np.full([vert.shape[0],1], 'v'), vert))
-face = np.loadtxt('./pixel2mesh/utils/ellipsoid/face3.obj', dtype='|S32')
-mesh = np.vstack((vert, face))
-pred_path = FLAGS.image.replace('.png', '.obj')
-np.savetxt(pred_path, mesh, fmt='%s', delimiter=' ')
+		# Training step
+		_, dists,out1,out2,out3 = sess.run([model.opt_op,model.loss,model.output1,model.output2,model.output3], feed_dict=feed_dict)
 
-print('Saved to', pred_path)
+		all_loss[iters] = dists
+		mean_loss = np.mean(all_loss[np.where(all_loss)])
+		if (iters+1) % 32 == 0:
+			print 'Epoch %d, Iteration %d'%(epoch + 1,iters + 1)
+			print 'Mean loss = %f, iter loss = %f, %d'%(mean_loss,dists,data.queue.qsize())
+	# Save model
+	model.save(sess)
+	train_loss.write('Epoch %d, loss %f\n'%(epoch+1, mean_loss))
+	train_loss.flush()
+
+data.shutdown()
+print 'Training Finished!'
