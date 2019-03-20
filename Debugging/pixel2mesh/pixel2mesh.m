@@ -29,7 +29,7 @@ for idx = 1:size(pool_idx,1)
     coord2 = [coord2;data_all(find(H==h),mod(idx+1,2)+2),data_all(find(H==h),1)];
 end
 coord2 = [coord;coord2];
-edge2 = [e
+edge2 = [
        1,2;3,4;5,6;7,8;
        9,1;9,10;9,3;
        11,3;11,5;11,12;
@@ -158,7 +158,9 @@ pkl{8}{2} = lap2;
 pkl{8}{3} = lap3;
 
 pkl{6} = coord_;
-save('pkl_.mat','pkl','data_all','im')
-save('pkl.dat','pkl')
+
+% save('pkl_.mat','pkl','data_all','im')
+save('pkl01.mat', 'pkl')
+% save 'pkl.dat' pkl -ascii
 
 
