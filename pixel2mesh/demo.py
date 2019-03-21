@@ -76,8 +76,8 @@ model.load(sess)
 
 # Runing the demo
 # pkl = pickle.load(open('./pixel2mesh/utils/ellipsoid/info_ellipsoid.dat', 'rb'))
-pkl = pickle.load(open('./Debugging/pixel2mesh/pkl.dat', 'rb'))
-
+import scipy.io
+pkl = scipy.io.loadmat('./Debugging/pixel2mesh/pkl01.mat')['pkl'][0]
 
 feed_dict = construct_feed_dict(pkl, placeholders)
 

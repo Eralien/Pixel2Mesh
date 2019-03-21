@@ -36,7 +36,7 @@ class DataFetcher(threading.Thread):
 		while self.index < 90000000 and not self.stopped:
 			self.queue.put(self.work(self.index % self.number))
 			self.index += 1
-			if self.index % self.number == 0:
+			if self.index % self.number == 0:file_lis
 				np.random.shuffle(self.pkl_list)
 	
 	def fetch(self):
