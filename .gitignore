@@ -6,4 +6,4 @@ pixel2mesh/external
 pixel2mesh/utils/checkpoint
 .vscode/
 *.m~
-to*
+Debugging/to* 
