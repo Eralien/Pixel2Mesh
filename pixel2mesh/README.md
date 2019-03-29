@@ -14,7 +14,9 @@
 0. \[0]: coordinates:
     - shape: (156, 3), 156 vertices with 3-dim coordinates
 
-1. \[1]: edge, feed into block 1 
+1. \[1]: edge, feed into block 1, define the convolution for the update the values 
+
+    **Note**: this is a sparse tensor represented in three dense tensors
     - \[0]:
         ```
         [0]: shape (156, 2) int, all composed by [n, n], n from 0 to 155
@@ -28,7 +30,7 @@
         [2]: = [156, 156]
         ```
 
-2. \[2]: edge, feed into block 2
+2. \[2]: edge, feed into block 2, define the convolution for the update the values 
     - \[0]:
         ```
         [0]: shape (618, 2) int, all composed by [n, n], n from 0 to 617
@@ -42,7 +44,7 @@
         [2]: = [618, 618]
         ```
 
-3. \[3]: edge, feed into block 3
+3. \[3]: edge, feed into block 3, define the convolution for the update the values 
     - \[0]:
         ```
         [0]: shape(2466, 2) int, all composed by [n, n], n from 1 to 156
@@ -78,7 +80,7 @@
 
 7. \[7]: laplacian normalization
     ```
-    [0]: shape (156, 10) int, \[-3] and \[-4] are always -1 
+    [0]: shape (156, 10) int, [-3] and [-4] are always -1 
     [1]: shape (618, 10) int
     [2]: shape (2466, 10) int
     ```
