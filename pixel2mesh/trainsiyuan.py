@@ -73,7 +73,7 @@ sess.run(tf.global_variables_initializer())
 model.load(sess)
 
 # Construct feed dictionary
-pkl = pickle.load(open('pixel2mesh/Debuggin/pixel2mesh/pkl.dat', 'rb'))
+pkl = pickle.load(open('./Debugging/pkl_test.dat', 'rb'))
 feed_dict = construct_feed_dict(pkl, placeholders)
 
 # Train model
