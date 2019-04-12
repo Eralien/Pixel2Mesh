@@ -7,3 +7,4 @@ pixel2mesh/utils/checkpoint
 .vscode/
 *.m~
 Debugging/to* 
+*.txt
