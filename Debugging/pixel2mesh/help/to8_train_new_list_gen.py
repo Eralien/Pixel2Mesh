@@ -2,7 +2,7 @@ import numpy as np
 
 LIST_PREFIX = './pixel2mesh/utils/'
 MATCH_WORDS = 'data/'
-REPLACE_WORDS = '/media/eralien/ReservoirLakeBed1/Pixel2Mesh'
+REPLACE_WORDS = '/media/eralien/ReservoirLakeBed/Pixel2Mesh/'
 
 def new_list_gen(from_list_path, to_list_path, read_num=None):
     with open(to_list_path, 'w') as f1:

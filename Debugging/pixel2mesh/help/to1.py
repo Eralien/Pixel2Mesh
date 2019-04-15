@@ -58,7 +58,7 @@ lapn    = data[7]
 
 feed_dict = construct_feed_dict(data, placeholders)
 
-coo_norm = np.zeros([coo.shape[0],1)
+# coo_norm = np.zeros([coo.shape[0],1)
 for row in range(coo.shape[0]):
 	coo_norm[row, 0] = norm(coo[row,:])
 
