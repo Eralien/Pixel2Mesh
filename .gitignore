@@ -8,3 +8,4 @@ pixel2mesh/utils/checkpoint
 *.m~
 Debugging/to* 
 *.txt
+*.npy
