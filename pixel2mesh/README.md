@@ -14,7 +14,7 @@
 0. \[0]: coordinates:
     - shape: (156, 3), 156 vertices with 3-dim coordinates
 
-1. \[1]: edge, feed into block 1, define the convolution for the update the values 
+1. \[1]: support1: feed into block 1, define the convolution for the update the values 
 
     **Note**: this is a sparse tensor represented in three dense tensors
     - \[0]:
@@ -23,9 +23,9 @@
         [1]: shape (156,), = ones(156, 1) float
         [2]: = [156, 156]
         ```
-    - \[1]:
+    - \[1]:  <span style="color:green">**[0] this goes into edge1**</span>
         ```
-        [0]: shape (1080, 2) int
+        [0]: shape (1080, 2) int 
         [1]: shape (1080,) float
         [2]: = [156, 156]
         ```
@@ -37,9 +37,9 @@
         [1]: shape (156,), = ones(618, 1) float
         [2]: [618, 618]
         ```
-    - \[1]:
+    - \[1]: <span style="color:green">**[0] this goes into edge2**</span>
         ``` 
-        [0]: shape (4314, 2) int
+        [0]: shape (4314, 2) int  
         [1]: shape (4314,) float
         [2]: = [618, 618]
         ```
@@ -51,9 +51,9 @@
         [1]: shape(2466,) = ones(2466, 1)
         [2]: = [2466, 2466]
         ```
-    - \[1]:
+    - \[1]: <span style="color:green">**[0] this goes into edge3**</span>
         ```
-        [0]: shape (17250, 2) int
+        [0]: shape (17250, 2) int 
         [1]: shape (17250,) float
         [2]: = [2466, 2466]
         ```
