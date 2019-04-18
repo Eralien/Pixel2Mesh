@@ -51,6 +51,7 @@ class DataFetcher(threading.Thread):
 
 if __name__ == '__main__':
 	file_list = sys.argv[1]
+	print(file_list)	
 	data = DataFetcher(file_list)
 	data.start()
 
