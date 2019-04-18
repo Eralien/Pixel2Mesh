@@ -4,7 +4,7 @@ import numpy as np
 import os
 from initial_graph import *
 
-tusimple_path_prefix = '/media/eralien/ReservoirLakeBed1/Pixel2Mesh/TuSimple/'
+tusimple_path_prefix = '/media/eralien/ReservoirLakeBed/Pixel2Mesh/TuSimple/'
 
 
 def img_save_path_check(path):
@@ -76,7 +76,7 @@ def plot_circle(height_num, width_num, arr_width, arr_height,
             color_lanedot = np.amax(color_lanedot_, axis=0)
 
 
-def dataset_gen(tusimple_path_base, initialGraph, train_flag=True,
+def dataset_gen(tusimple_path_base, train_flag=True,
                 binary_path=None, instance_path=None, output_path=None, write=False):
     if train_flag:
         tusimple_path = tusimple_path_base + 'train_set/'
@@ -104,7 +104,7 @@ def dataset_gen(tusimple_path_base, initialGraph, train_flag=True,
         height_num = len(arr_height)
         
         # Call initialGraph for each image/label input
-        initialGraph(arr_width, arr_height)
+        # initialGraph(arr_width, arr_height)
 
         plot_line(height_num, width_num, arr_width, arr_height,
                   binaryimage, instanceimage, image)
@@ -139,5 +139,5 @@ def dataset_gen(tusimple_path_base, initialGraph, train_flag=True,
 
 
 if __name__ == "__main__":
-    initialGraph = InitGraph()
-    dataset_gen(tusimple_path_prefix, initialGraph)
+    # initialGraph = InitGraph()
+    dataset_gen(tusimple_path_prefix), #initialGraph)

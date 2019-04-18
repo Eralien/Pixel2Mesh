@@ -45,7 +45,8 @@ if __name__ == "__main__":
                'C': {1: 1, '2': 2}, 'D': 'string bla'}
 
     # pkl_path = './Debugging/pkl_test.dat'
-    pkl_path = '/media/eralien/ReservoirLakeBed1/Pixel2Mesh/ShapeNetTrain/04256520_1a4a8592046253ab5ff61a3a2a0e2484_00.dat'
+    # pkl_path = '/media/eralien/ReservoirLakeBed1/Pixel2Mesh/ShapeNetTrain/04256520_1a4a8592046253ab5ff61a3a2a0e2484_00.dat'
+    pkl_path = './Debugging/pixel2mesh/help/initGraph.dat'
     pkl_dict = dat_read(pkl_path)
     img = pkl_dict[0].astype('float32')/255.0
     label = pkl_dict[1]

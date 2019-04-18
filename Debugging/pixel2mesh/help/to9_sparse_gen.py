@@ -15,9 +15,9 @@ if __name__ == "__main__":
     value = np.ones([2,])
     shape = np.array([2,2])
     sparse_a = [indices, value, shape]
-    sparse_a_tf = [tf.sparse_placeholder(tf.float32) for _ in range(3)]
+    sparse_a_tf = tf.sparse_placeholder(tf.float32)
     feed_dict = dict()
-    feed_dict.update({sparse_a_tf[i]:sparse_a[i] for i in range(len(sparse_a))})
+    feed_dict.update({sparse_a_tf:sparse_a})
     pass
     # sparse_a_tf = tf.convert_to_tensor(sparse_a)
 
