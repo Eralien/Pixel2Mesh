@@ -9,3 +9,4 @@ pixel2mesh/utils/checkpoint
 Debugging/to* 
 *.txt
 *.npy
+*.log
