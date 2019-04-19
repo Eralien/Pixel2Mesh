@@ -2,6 +2,7 @@ import cv2
 import json
 import numpy as np
 import os
+from initial_graph import *
  
 tusimple_path_base = '/media/eralien/ReservoirLakeBed/Pixel2Mesh/TuSimple/'
 
@@ -61,4 +62,5 @@ binary_path=None, instance_path=None,output_path=None):
     file.close()
 
 if __name__ == "__main__":
+    initGraph = InitGraph()
     dataset_gen(tusimple_path_base)

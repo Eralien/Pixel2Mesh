@@ -292,10 +292,10 @@ class InitGraph(object):
     # Write in new entry of image information
     def write_dataset(self, label, img, dat_path, remove_origin=True):
         dat_split = str(dat_path).split('/')
-        dir_path = "/".join(dat_split[:-1])
+        dir_path = "/".join(dat_split[:-2])
         dir_path = "./Debugging/dataset/" + dir_path
-        filename = dat_split[-1]
-        write_path='./Debugging/dataset/' + str(dat_path) + '.dat'
+        filename = dat_split[-2]
+        write_path = dir_path + "/" + filename + ".dat"
         data_pack = {'img_inp':img, 'labels':label}
         
         if not os.path.exists(dir_path): 

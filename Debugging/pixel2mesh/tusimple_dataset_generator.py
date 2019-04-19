@@ -120,13 +120,13 @@ def dataset_gen(tusimple_path_base, train_flag=True,
             cv2.imwrite(save_instance_path, instanceimage)
             cv2.imwrite(save_color_path, image)
         else:
-            # cv2.namedWindow("Image") 
-            # cv2.namedWindow("Binary") 
-            # cv2.namedWindow("Instance") 
-            # cv2.imshow("Image", image)
-            # cv2.imshow("Binary", binaryimage) 
-            # cv2.imshow("Instance", instanceimage) 
-            # cv2.waitKey(0)
+            cv2.namedWindow("Image") 
+            cv2.namedWindow("Binary") 
+            cv2.namedWindow("Instance") 
+            cv2.imshow("Image", image)
+            cv2.imshow("Binary", binaryimage) 
+            cv2.imshow("Instance", instanceimage) 
+            cv2.waitKey(0)
             pass
 
         image_num += 1

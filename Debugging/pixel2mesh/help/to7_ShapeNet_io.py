@@ -103,11 +103,12 @@ def randrange(n, vmin, vmax):
 if __name__ == "__main__":
 
     print(os.getcwd())
-    # pkl_path = '/media/eralien/ReservoirLakeBed1/Pixel2Mesh/ShapeNetTrain/04256520_1a4a8592046253ab5ff61a3a2a0e2484_00.dat'
-    pkl_path = '/media/eralien/ReservoirLakeBed1/Pixel2Mesh/ShapeNetTrain/02691156_787d2fbb247c04266818a2bd5aa39c80_08.dat'
+    # pkl_path = '/media/eralien/ReservoirLakeBed/Pixel2Mesh/ShapeNetTrain/04256520_1a4a8592046253ab5ff61a3a2a0e2484_00.dat'
+    pkl_path = '/media/eralien/ReservoirLakeBed/Pixel2Mesh/ShapeNetTrain/02691156_787d2fbb247c04266818a2bd5aa39c80_08.dat'
     # Read the .dat file
     _, gt_pt, gt_nm = dat_read(pkl_path)
 
+    gt_pt
     # Draw the 3D Plot
     plot_3D_ConvexHull(gt_pt)
 
