@@ -2,7 +2,7 @@ import cv2
 import json
 import numpy as np
 import os
-from initial_graph import *
+from initial_graph import InitGraph
 
 tusimple_path_prefix = '/media/eralien/ReservoirLakeBed/Pixel2Mesh/TuSimple/'
 
@@ -104,7 +104,7 @@ def dataset_gen(tusimple_path_base, train_flag=True,
         height_num = len(arr_height)
         
         # Call initialGraph for each image/label input
-        # initialGraph(arr_width, arr_height)
+        initialGraph(arr_width, arr_height, image, data['raw_file'])
 
         plot_line(height_num, width_num, arr_width, arr_height,
                   binaryimage, instanceimage, image)
@@ -120,13 +120,14 @@ def dataset_gen(tusimple_path_base, train_flag=True,
             cv2.imwrite(save_instance_path, instanceimage)
             cv2.imwrite(save_color_path, image)
         else:
-            cv2.namedWindow("Image") 
-            cv2.namedWindow("Binary") 
-            cv2.namedWindow("Instance") 
-            cv2.imshow("Image", image)
-            cv2.imshow("Binary", binaryimage) 
-            cv2.imshow("Instance", instanceimage) 
-            cv2.waitKey(0)
+            # cv2.namedWindow("Image") 
+            # cv2.namedWindow("Binary") 
+            # cv2.namedWindow("Instance") 
+            # cv2.imshow("Image", image)
+            # cv2.imshow("Binary", binaryimage) 
+            # cv2.imshow("Instance", instanceimage) 
+            # cv2.waitKey(0)
+            pass
 
         image_num += 1
         print("image_num: " + str(image_num))
@@ -139,5 +140,5 @@ def dataset_gen(tusimple_path_base, train_flag=True,
 
 
 if __name__ == "__main__":
-    # initialGraph = InitGraph()
-    dataset_gen(tusimple_path_prefix), #initialGraph)
+    initialGraph = InitGraph(init_graph_write=False)
+    dataset_gen(tusimple_path_prefix, initialGraph)
