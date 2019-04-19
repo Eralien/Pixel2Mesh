@@ -1,16 +1,12 @@
 from __future__ import print_function
 import numpy as np
 import os
-import sys
-import matplotlib.pyplot as plt
-import time
 import cv2
 import cPickle as pickle
-# from Debugging.pixel2mesh.help.initGraph_help import *
 
 
 class InitGraph(object):
-    def __init__(self, size=[6, 8], name='init_graph'):
+    def __init__(self, size=[6, 8], init_graph_write=True, name='init_graph'):
         self.init_dt = np.dtype(
             [('index', np.int64, 2), ('position', np.float16, 2), ('coord', np.int16, 2)])
         self.init = np.empty(size, dtype=self.init_dt)
@@ -18,7 +14,10 @@ class InitGraph(object):
         self.lane = self.size[0]
         self.height = self.size[1]
         self.vertices = self.lane*self.height
-        self.param = {'top': 0.5, 'bot': -0.5, 'up_len': 0.1, 'low_len': 1}
+        self.param = {'top': 0.5, 'bot': -0.5, 'up_len': 0.1, 'low_len': 1,
+                      'left': -0.5, 'right': 0.5, 'up': 1, 'down': -0.5,
+                      'img_up': 150, 'img_down': 720, 'img_left': 0, 'img_right': 1280}
+        self.mapping()
         self.coord = np.array([]).reshape((0, 3))
         self.support = []
         self.pool_idx = []
@@ -42,13 +41,27 @@ class InitGraph(object):
             self.lapn_idx.append(self.lapn_idx_)
 
         self.height_end = height
+        self.vertices_end = vertices
+        self.edges_end = edges
 
         # Generate .dat file
         self.init_graph_data = (self.coord,
                                 self.support[0], self.support[1], self.support[2],
                                 self.pool_idx, self.faces,
                                 self.data6, self.lapn_idx)
-        self.write_init_graph()
+        if init_graph_write is True:
+            self.write_init_graph()
+
+    def mapping(self):
+        self.transform = {}
+        self.transform['height_a'] = (
+            self.param['down']-self.param['up'])/(self.param['img_down']-self.param['img_up'])
+        self.transform['height_b'] = self.param['up'] - \
+            self.param['img_up']*self.transform['height_a']
+        self.transform['width_a'] = (
+            self.param['right']-self.param['left'])/(self.param['img_right']-self.param['img_left'])
+        self.transform['width_b'] = self.param['right'] - \
+            self.param['img_right']*self.transform['width_a']
 
     ######################################
     # Initial Graph .dat generator block #
@@ -66,10 +79,11 @@ class InitGraph(object):
             vertices = height * lane
             iteration = iteration + 1
 
-
     ### Coord Functions ###
 
     def class_assign(self):
+        # Class assign to each lane!
+        #
         half_lane = self.lane / 2
         class_vec = np.arange(1, self.lane+1, 2)
         class_vec_ = class_vec[:half_lane] + 1
@@ -88,7 +102,6 @@ class InitGraph(object):
             y_coord = np.tile(y_linsp[i], self.lane)
             coord_temp = np.vstack((x_coord, y_coord, self.class_vec))
             self.coord = np.vstack((self.coord, np.transpose(coord_temp)))
-
 
     ### Pooling_idx Functions ###
 
@@ -118,7 +131,6 @@ class InitGraph(object):
             p = p + l
         self.pool_mat = pool_mat.copy()
         return self.pool_pair(pool_mat)
-
 
     ### Support Functions ###
 
@@ -162,14 +174,14 @@ class InitGraph(object):
             val for sublist in pair_3_index_list for val in sublist]
         pair_4_index_list = list(
             set(range(vertices)) - set(pair_3_index_list_) - set(pair_2_index_list))
-        
+
         # Natural indexed matrix
         pair_2_index_list = np.array(pair_2_index_list)
         pair_3_index_list = np.array(pair_3_index_list)
         pair_4_index_list = np.array(pair_4_index_list)
         pair_3_index_list_ = np.array(pair_3_index_list_)
 
-        # If in block 1, there's no pooling so the pooling mat equals the natural 
+        # If in block 1, there's no pooling so the pooling mat equals the natural
         # indexed matrix
         if self.pool_mat is None:
             self.pool_mat = np.arange(vertices).reshape((height, self.lane))
@@ -235,19 +247,17 @@ class InitGraph(object):
         adjacency_sp = self.support_gen_adjacency(vertices, height)
         return [identity_sp, adjacency_sp]
 
-
     ### Generate Faces idx: which does not exist ;) ###
 
     def faces_gen(self):
         pass
 
-
     ### Generate Laplacian idx ###
 
     def lapn_idx_gen(self, vertex_idx, lapn_temp, pair_num):
-        assert pair_num==len(lapn_temp)
-        self.lapn_idx_[vertex_idx,:pair_num] = np.asarray(lapn_temp)
-        self.lapn_idx_[vertex_idx,-1] = pair_num
+        assert pair_num == len(lapn_temp)
+        self.lapn_idx_[vertex_idx, :pair_num] = np.asarray(lapn_temp)
+        self.lapn_idx_[vertex_idx, -1] = pair_num
         pass
 
     def write_init_graph(self, write_path='./Debugging/pixel2mesh/help/initGraph.dat', remove_origin=True):
@@ -262,31 +272,79 @@ class InitGraph(object):
             pickle.dump(self.init_graph_data, data_file)
             print('Done')
 
-    # Close this object, to generate .dat file with multiple images
-    def close(self):
-        pass
-
     #########################################
     # Training Dataset .dat generator block #
     #########################################
-    def mid_lane_det(self):
+
+    def mid_lane_det(self, lanes):
+        # left_side and right_side calculates the numbers of pixels
+        # that belongs to which side, then calculate the difference
+        # that left side is more than right side
+        right_side = np.asarray([len(sublist[sublist >= 640])
+                                 for sublist in lanes])
+        left_side = np.asarray(
+            [len(sublist[(sublist > 0) & (sublist < 640)]) for sublist in lanes])
+        count_from_left = left_side - right_side
+
+        # return to the idx of the first lane that belongs to the right side
+        return np.where(count_from_left < 0)[0][0]
+
+    # Write in new entry of image information
+    def write_dataset(self, label, img, dat_path, remove_origin=True):
+        dat_split = str(dat_path).split('/')
+        dir_path = "/".join(dat_split[:-1])
+        dir_path = "./Debugging/dataset/" + dir_path
+        filename = dat_split[-1]
+        write_path='./Debugging/dataset/' + str(dat_path) + '.dat'
+        data_pack = {'img_inp':img, 'labels':label}
+        
+        if not os.path.exists(dir_path): 
+            os.makedirs(dir_path)            
+        # Check remove need or not
+        else:
+            if remove_origin:
+                try:
+                    os.remove(write_path)
+                except OSError:
+                    pass
+        # Write the new .dat file of Initial Graph
+        with open(write_path, 'wb') as data_file:
+            print('Writing to ' + write_path)
+            pickle.dump(data_pack, data_file)
+            print('Done')
         pass
 
-    def __call__(self, name, lanes, h_samples):
-        self.data_dt = np.dtype(
-            [('', np.int64, 2), ('position', np.float16, 2), ('coord', np.int16, 2)])
+    def __call__(self, list_lanes, list_h_samples, raw_image, output_path):
+        lanes_info = np.asarray(list_lanes)
+        height_info = np.asarray(list_h_samples)
+        # h, w, _ = raw_image.shape
+        output_path = output_path.split(".")[0]
+        label = np.array([]).reshape((0, 6))
+
+        # mid_lane_num refer to the first right lane idx (starting from 0)
+        # mid_lane_ref refer to the first right lane idx in initial graph
+        mid_lane_num = self.mid_lane_det(lanes_info)
+        mid_lane_ref = (self.lane+1)/2
+
+        # This iteration loops each lane
+        for z, lane_info in zip(self.class_vec[max(mid_lane_ref-mid_lane_num, 0):],
+                                lanes_info[max(mid_lane_num-mid_lane_ref, 0):]):
+            # This iteration loops every element in one lane
+            for img_x, img_y in zip(lane_info, height_info):
+                x = img_x*self.transform['width_a'] + self.transform['width_b']
+                y = img_y*self.transform['height_a'] + self.transform['height_b']
+                label = np.vstack((label, np.array([x,y,z,0,0,0])))
+        
+        self.write_dataset(label, raw_image, output_path)
 
     # Release discarded memories
 
     def __del__(self):
         pass
 
-    # Write in new entry of image information
-    def write_img(self):
-        # pickel IO support in here!!!
-        pass
 
 
 if __name__ == "__main__":
     initGraph = InitGraph()
+    # initGraph()
     pass
