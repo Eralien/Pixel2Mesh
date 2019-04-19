@@ -75,7 +75,7 @@
     ```
     [0]: shape (156, 3) float. very small number (first block)
     [1]: shape (618, 3) float, very small number (NOT 628) (second block)
-    [2]: shape (2466, 4) flaot, very small number (third block)
+    [2]: shape (2466, 4) float, very small number (third block)
     ```
 
 7. \[7]: laplacian normalization
