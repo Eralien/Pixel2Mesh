@@ -13,3 +13,4 @@ Debugging/to*
 *.dat
 Debugging/pic
 graphs/*
+*.json
