@@ -13,3 +13,6 @@ Debugging/to*
 *.dat
 Debugging/pic
 dataset/
+graphs/*
+*.json
+*.matlab

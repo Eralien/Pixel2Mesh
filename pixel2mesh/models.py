@@ -57,6 +57,7 @@ class Model(object):
             self.activations.append(hidden)
 
         self.output1 = self.activations[15]
+        self.output1_size = self.output1.get_shape()
         unpool_layer = GraphPooling(placeholders=self.placeholders, pool_id=1)
         self.output1_2 = unpool_layer(self.output1)
 
@@ -85,15 +86,18 @@ class Model(object):
         if not sess:
             raise AttributeError("TensorFlow session not provided.")
         saver = tf.train.Saver(self.vars)
-        save_path = saver.save(sess, "utils/checkpoint/%s.ckpt" % self.name)
+        save_path = saver.save(sess, "./pixel2mesh/utils/checkpoint/%s.ckpt" % self.name)
         print("Model saved in file: %s" % save_path)
 
     def load(self, sess=None):
         if not sess:
             raise AttributeError("TensorFlow session not provided.")
         saver = tf.train.Saver(self.vars)
-        save_path = "pixel2mesh/utils/checkpoint/%s.ckpt" % self.name
-        saver.restore(sess, save_path)
+        save_path = "./pixel2mesh/utils/checkpoint/%s.ckpt" % self.name
+        try:
+            saver.restore(sess, save_path)
+        except:
+            saver.save(sess, save_path) 
         print("Model restored from file: %s" % save_path)
 
 class GCN(Model):

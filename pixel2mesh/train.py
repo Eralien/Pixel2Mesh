@@ -45,7 +45,7 @@ def construct_feed_dict(pkl, placeholders):
 	edges = []
 	for i in range(1,4):
 		adj = pkl[i][1]
-		edges.append(adj[0])
+		edges.append(adj[0])	
 
 	feed_dict = dict()
 	feed_dict.update({placeholders['features']: coord})
