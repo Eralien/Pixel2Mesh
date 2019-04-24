@@ -86,14 +86,14 @@ class Model(object):
         if not sess:
             raise AttributeError("TensorFlow session not provided.")
         saver = tf.train.Saver(self.vars)
-        save_path = saver.save(sess, "utils/checkpoint/%s.ckpt" % self.name)
+        save_path = saver.save(sess, "./pixel2mesh/utils/checkpoint/%s.ckpt" % self.name)
         print("Model saved in file: %s" % save_path)
 
     def load(self, sess=None):
         if not sess:
             raise AttributeError("TensorFlow session not provided.")
         saver = tf.train.Saver(self.vars)
-        save_path = "pixel2mesh/utils/checkpoint/%s.ckpt" % self.name
+        save_path = "./pixel2mesh/utils/checkpoint/%s.ckpt" % self.name
         saver.restore(sess, save_path)
         print("Model restored from file: %s" % save_path)
 
