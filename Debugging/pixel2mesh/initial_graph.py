@@ -22,7 +22,7 @@ class InitGraph(object):
         self.support = []
         self.pool_idx = []
         self.pool_mat = None
-        self.faces = None
+        self.faces = []
         self.data6 = None
         self.lapn_idx = []
 
@@ -34,11 +34,11 @@ class InitGraph(object):
         # Three Blocks iteration to get some parameters
         for height, vertices, edges, block_idx in self.block_generator():
             # Generate Pooling index
-            if block_idx > 1:
-                self.pool_idx.append(self.pool_idx_gen(height, block_idx))
+            self.pool_idx.append(self.pool_idx_gen(height, block_idx))
             # Generate Support recursively
             self.support.append(self.support_gen(vertices, height))
             self.lapn_idx.append(self.lapn_idx_)
+            self.faces_gen()
 
         self.height_end = height
         self.vertices_end = vertices
@@ -47,7 +47,7 @@ class InitGraph(object):
         # Generate .dat file
         self.init_graph_data = (self.coord,
                                 self.support[0], self.support[1], self.support[2],
-                                self.pool_idx, self.faces,
+                                self.pool_idx[:-1], self.faces,
                                 self.data6, self.lapn_idx)
         if init_graph_write is True:
             self.write_init_graph()
@@ -247,11 +247,6 @@ class InitGraph(object):
         adjacency_sp = self.support_gen_adjacency(vertices, height)
         return [identity_sp, adjacency_sp]
 
-    ### Generate Faces idx: which does not exist ;) ###
-
-    def faces_gen(self):
-        pass
-
     ### Generate Laplacian idx ###
 
     def lapn_idx_gen(self, vertex_idx, lapn_temp, pair_num):
@@ -259,7 +254,14 @@ class InitGraph(object):
         self.lapn_idx_[vertex_idx, :pair_num] = np.asarray(lapn_temp)
         self.lapn_idx_[vertex_idx, -1] = pair_num
         pass
+    
+    ### Generate Faces idx: which does not exist ;) ###
 
+    def faces_gen(self):
+        self.faces.append(np.zeros((self.lapn_idx_.shape[0], 4)))
+
+    ### Write the initial graph ###
+    
     def write_init_graph(self, write_path='./Debugging/pixel2mesh/help/initGraph.dat', remove_origin=True):
         if remove_origin:
             try:
@@ -296,7 +298,9 @@ class InitGraph(object):
         dir_path = "./Debugging/dataset/" + dir_path
         filename = dat_split[-2]
         write_path = dir_path + "/" + filename + ".dat"
-        data_pack = {'img_inp':img, 'labels':label}
+        # data_pack = {'img_inp':img, 'labels':label}
+        img = cv2.resize(img, (224, 224))
+        data_pack = [img, label]
         
         if not os.path.exists(dir_path): 
             os.makedirs(dir_path)            
