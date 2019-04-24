@@ -58,6 +58,17 @@ def construct_feed_dict(pkl, placeholders):
 	feed_dict.update({placeholders['support3'][i]: pkl[3][i] for i in range(len(pkl[3]))})
 	return feed_dict
 
+# Get actual shape
+# shape_output1 = tf.shape(model.output1)
+# shape_output2 = tf.shape(model.output2)
+# shape_output3 = tf.shape(model.output3)
+# shape_output1_2 = tf.shape(model.output1_2)
+# shape_output2_2 = tf.shape(model.output2_2)
+
+# Tensorboard
+writer = tf.summary.FileWriter('./graphs', tf.get_default_graph())
+
+
 # Load data
 data = DataFetcher(FLAGS.data_list)
 data.setDaemon(True) ####
@@ -73,7 +84,7 @@ sess.run(tf.global_variables_initializer())
 model.load(sess)
 
 # Construct feed dictionary
-pkl = pickle.load(open('./Debugging/pkl_test.dat', 'rb'))
+pkl = pickle.load(open('./Debugging/pixel2mesh/help/initGraph.dat', 'rb'))
 feed_dict = construct_feed_dict(pkl, placeholders)
 
 # Train model
@@ -88,8 +99,9 @@ for epoch in range(FLAGS.epochs):
 		feed_dict.update({placeholders['labels']: y_train})
 
 		# Training step
+		output1,output1_2 = sess.run(
+			[model.output1,model.output1_2], feed_dict=feed_dict)
 		_, dists,out1,out2,out3 = sess.run([model.opt_op,model.loss,model.output1,model.output2,model.output3], feed_dict=feed_dict)
-
 		all_loss[iters] = dists
 		mean_loss = np.mean(all_loss[np.where(all_loss)])
 		if (iters+1) % 32 == 0:
@@ -99,6 +111,7 @@ for epoch in range(FLAGS.epochs):
 	model.save(sess)
 	train_loss.write('Epoch %d, loss %f\n'%(epoch+1, mean_loss))
 	train_loss.flush()
-
+	
+writer.close()
 data.shutdown()
 print 'Training Finished!'

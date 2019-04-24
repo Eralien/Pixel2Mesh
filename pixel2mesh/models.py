@@ -57,6 +57,7 @@ class Model(object):
             self.activations.append(hidden)
 
         self.output1 = self.activations[15]
+        self.output1_size = self.output1.get_shape()
         unpool_layer = GraphPooling(placeholders=self.placeholders, pool_id=1)
         self.output1_2 = unpool_layer(self.output1)
 

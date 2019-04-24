@@ -153,10 +153,8 @@ class GraphPooling(Layer):
 
 	def _call(self, inputs):
 		X = inputs
-
-		add_feat = (1/2.0) * tf.reduce_sum(tf.gather(X, self.pool_idx), 1)
+		add_feat = 0.5 * tf.reduce_sum(tf.gather(X, self.pool_idx), 1)
 		outputs = tf.concat([X, add_feat], 0)
-
 		return outputs
 
 class GraphProjection(Layer):
