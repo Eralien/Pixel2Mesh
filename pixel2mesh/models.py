@@ -94,7 +94,10 @@ class Model(object):
             raise AttributeError("TensorFlow session not provided.")
         saver = tf.train.Saver(self.vars)
         save_path = "./pixel2mesh/utils/checkpoint/%s.ckpt" % self.name
-        saver.restore(sess, save_path)
+        try:
+            saver.restore(sess, save_path)
+        except:
+            saver.save(sess, save_path) 
         print("Model restored from file: %s" % save_path)
 
 class GCN(Model):
