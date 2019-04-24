@@ -16,3 +16,4 @@ dataset/
 graphs/*
 *.json
 *.matlab
+build/*
