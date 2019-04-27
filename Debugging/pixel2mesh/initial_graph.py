@@ -45,11 +45,11 @@ class InitGraph(object):
         self.edges_end = edges
 
         # Generate .dat file
-        self.init_graph_data = (self.coord,
+        if init_graph_write is True:
+            self.init_graph_data = (self.coord,
                                 self.support[0], self.support[1], self.support[2],
                                 self.pool_idx[:-1], self.faces,
                                 self.data6, self.lapn_idx)
-        if init_graph_write is True:
             self.write_init_graph()
 
     def mapping(self):
@@ -85,9 +85,9 @@ class InitGraph(object):
         # Class assign to each lane!
         #
         half_lane = self.lane / 2
-        class_vec = np.arange(1, self.lane+1, 2)
-        class_vec_ = class_vec[:half_lane] + 1
-        return np.concatenate((class_vec, class_vec_[::-1]))
+        class_vec = np.arange(1, self.lane+1, 2)[::-1]
+        class_vec_ = (np.arange(half_lane)+1)*2
+        return np.concatenate((class_vec, class_vec_))
 
     def coord_gen(self, height):
         # First to generate the right-most line of dots x,y coord
@@ -297,6 +297,49 @@ class InitGraph(object):
         # return to the idx of the first lane that belongs to the right side
         return np.where(count_from_left < 0)[0][0]
 
+    def lane_true_distinguish(self, lane_info):
+        lane_true_idx = np.asarray(np.where(lane_info!=-2)).reshape(-1)
+        lane_false_idx = np.asarray(np.where(lane_info==-2)).reshape(-1)
+        lane_true = np.take(lane_info, lane_true_idx)
+        return lane_true, lane_true_idx, lane_false_idx
+
+    def label_gen(self, lane_info, height_info, z):
+        lane_info_true, lane_true_idx, lane_false_idx = self.lane_true_distinguish(lane_info)    
+        lane_info_true = lane_info_true * self.transform['width_a'] + self.transform['width_b']
+        height_info = height_info * self.transform['height_a'] + self.transform['height_b']
+
+        height_info_true = np.take(height_info, lane_true_idx)
+        height_info_false = np.take(height_info, lane_false_idx)
+    
+        # Cubic Fitting: Notice that height is x, lane_info is y!!!! --for convenience
+        fitting = np.polyfit(height_info_true, lane_info_true, 3)
+        [a,b,c,_] = fitting
+        func_fitting = np.poly1d(fitting)
+        func_normal = np.poly1d([3*a, 2*b, c])
+
+        # Fit lane_false values
+        lane_info_false = func_fitting(height_info_false) 
+        
+        # Normal values on true height points
+        normal_val = func_normal(height_info_true)
+        normal_val = np.vstack((np.ones(normal_val.shape) * -1, normal_val))  
+        normal_len = np.linalg.norm(normal_val, axis=0) 
+        normal_val = normal_val / normal_len
+
+        # Generate label 
+        label_ = np.zeros((len(height_info), 6)) # Initialize
+        # For lane false part where z = -2 and normal = zeros
+        label_[lane_false_idx, 0] = lane_info_false
+        label_[lane_false_idx, 1] = height_info_false
+        label_[lane_false_idx, 2] = -2
+        # For lane true part where normal are implemented
+        label_[lane_true_idx, 0] = lane_info_true
+        label_[lane_true_idx, 1] = height_info_true
+        label_[lane_true_idx, 2] = z
+        label_[lane_true_idx, 3:5] = normal_val.T
+
+        return label_
+
     # Write in new entry of image information
     def write_dataset(self, label, img, dat_path, remove_origin=True):
         dat_split = str(dat_path).split('/')
@@ -336,14 +379,16 @@ class InitGraph(object):
         mid_lane_num = self.mid_lane_det(lanes_info)
         mid_lane_ref = (self.lane+1)/2
 
-        # This iteration loops each lane
+        # This iteration loops each lane. Distinguish lanes_info and lane_info
         for z, lane_info in zip(self.class_vec[max(mid_lane_ref-mid_lane_num, 0):],
                                 lanes_info[max(mid_lane_num-mid_lane_ref, 0):]):
-            # This iteration loops every element in one lane
-            for img_x, img_y in zip(lane_info, height_info):
-                x = img_x*self.transform['width_a'] + self.transform['width_b']
-                y = img_y*self.transform['height_a'] + self.transform['height_b']
-                label = np.vstack((label, np.array([x,y,z,0,0,0])))
+            '''
+            Notice that if we have lane_info element == -2 which means no point at here, 
+            we need to assign a proper x for it!
+            Use fitting to assign a proper 
+            '''
+            label_ = self.label_gen(lane_info, height_info, z)
+            label = np.vstack((label, label_))
         
         self.write_dataset(label, raw_image, output_path)
 
