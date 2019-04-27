@@ -161,10 +161,12 @@ class InitGraph(object):
         self.lapn_idx_ = np.ones((vertices, 10), dtype=np.int)*-1
         self.lapn_idx_[:, -2] = np.arange(vertices)
 
-        # Classify all the indices into three categories
-        # corresponding to the corners, edges and inner indices
-        # Use roll to recursively assign pair indices
-        # Pair_movement is clockwise, starting from 3 o'clock
+        '''
+        Classify all the indices into three categories
+        corresponding to the corners, edges and inner indices.
+        Use roll to recursively assign pair indices
+        Pair_movement is clockwise, starting from 3 o'clock
+        '''
         pair_2_index_list = [0, self.lane-1, vertices-1, vertices-self.lane]
         pair_3_index_list = [range(1, self.lane-1),
                              range(2*self.lane-1, vertices-1, self.lane),
@@ -186,9 +188,11 @@ class InitGraph(object):
         if self.pool_mat is None:
             self.pool_mat = np.arange(vertices).reshape((height, self.lane))
 
-        # Map these lists as dictionary keys to corresponding linked node numbers as values
-        # Note that these keys are NATURAL indices of entries,
-        # not the non-natural pooling indices!!!
+        '''
+        Map these lists as dictionary keys to corresponding linked node numbers as values
+        Note that these keys are NATURAL indices of entries,
+        not the non-natural pooling indices!!!
+        '''
         pair_num_dict = self.pair_num_gen(
             [pair_2_index_list, pair_3_index_list_, pair_4_index_list])
 
@@ -279,9 +283,11 @@ class InitGraph(object):
     #########################################
 
     def mid_lane_det(self, lanes):
-        # left_side and right_side calculates the numbers of pixels
-        # that belongs to which side, then calculate the difference
-        # that left side is more than right side
+        ''' 
+        left_side and right_side calculates the numbers of pixels
+        that belongs to which side, then calculate the difference
+        that left side is more than right side
+        '''
         right_side = np.asarray([len(sublist[sublist >= 640])
                                  for sublist in lanes])
         left_side = np.asarray(
